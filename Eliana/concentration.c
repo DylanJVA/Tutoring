@@ -1,36 +1,86 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 int score = 0;
-
+struct cardStruct {
+        char planet[10];
+        int flipped;
+    };
+    typedef struct cardStruct card;
+card *cards;
 void initialize() {
     printf("Setting up the game...\n");
+    srand(time(0));
+    
+    
+    cards=(card*)malloc(16*sizeof(card));
+
+    char planets[8][10] = {
+        "mercery",
+        "venus",
+        "earth",
+        "mars",
+        "jupiter",
+        "saturn",
+        "uranus",
+        "neptune"
+                    };
+
+
+    for (int i=0;i<8;i++)
+    {
+        int rng = rand()%16;
+        while (cards[rng].planet[0]!=0)
+        {
+            rng=rand()%16;
+        }
+        strcpy(cards[rng].planet,planets[i]);
+        cards[rng].flipped=0;
+
+        rng = rand()%16;
+        while (cards[rng].planet[0]!=0)
+        {
+            rng=rand()%16;
+        }
+        strcpy(cards[rng].planet,planets[i]);
+        cards[rng].flipped=0;
+    }
+    for (int i=0;i<16;i++)
+    {
+        printf("%d. %s\n",i+1,cards[i].planet);
+    }
+    
 }
 
 void teardown() {
-    printf("Destroying the game...\n");
+    printf("\nCongrats! You won!");
+    printf("\nDestroying the game...\n");
 }
 
 int * input() {
     static int guesses[2] = {0,0}; 
     do {
-        printf("Enter num 1 (1-40, 0 to exit)\n");
+        printf("Enter num 1 (1-16, 0 to exit)\n");
         scanf("%d",&guesses[0]);
-    } while (guesses[0] > 40 || guesses[0] < 0);
+    } while (guesses[0] > 16 || guesses[0] < 0 || cards[guesses[0]-1].flipped == 1);
 
     if (guesses[0] == 0) return guesses;
 
     do {
-        printf("Enter num 2 (1-40, 0 to exit, NOT %d)\n", guesses[0]);
+        printf("Enter num 2 (1-16, 0 to exit, NOT %d)\n", guesses[0]);
         scanf("%d",&guesses[1]);
-    } while (guesses[1] > 40 || guesses[1] < 0 || guesses[1] == guesses[0]);
+    } while (guesses[1] > 16 || guesses[1] < 0 || guesses[1] == guesses[0] || cards[guesses[1]-1].flipped == 1);
     
     return guesses;
 }
 
 int update(int * nums) { 
-    if (nums[1] == 2*nums[0])
+    if (strcmp(cards[nums[0]-1].planet,cards[nums[1]-1].planet)==0)
     {
         score = score + 1;
+        cards[nums[0]-1].flipped = 1;
+        cards[nums[1]-1].flipped = 1;
         return 1;
     }
     else return 0;
@@ -41,16 +91,24 @@ void display(int isMatch) {
     else printf("This wasn't a match\n");
     
     printf("Score: %d\n", score);
+
+    printf("Remaining card numbers: ");
+    for (int i = 0; i <16; i++)
+    {
+        if (cards[i].flipped!=1) printf("%d, ",i+1);
+    }
 }
 
 int main() {
     initialize();
     int flag = 0;
     do {
-        int * nums = input();
+        if (score == 8) flag = 1;
+        int * nums;
+        if (flag!=1) nums = input();
         if (nums[0] == 0 || nums[1] == 0)
             flag = 1;
-        else display(update(nums));
+        if (flag!=1) display(update(nums));
     } while(flag == 0);
 
     teardown();
