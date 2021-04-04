@@ -2,17 +2,21 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-int score = 0;
+int score;
+int flag;
+//card structure "object" in java
 struct cardStruct {
         char planet[10];
         int flipped;
     };
-    typedef struct cardStruct card;
+typedef struct cardStruct card;
+
 card *cards;
 void initialize() {
     printf("Setting up the game...\n");
     srand(time(0));
-    
+    score=0;
+    flag=0;
     
     cards=(card*)malloc(16*sizeof(card));
 
@@ -54,8 +58,8 @@ void initialize() {
 }
 
 void teardown() {
-    printf("\nCongrats! You won!");
     printf("\nDestroying the game...\n");
+    free(cards);
 }
 
 int * input() {
@@ -79,6 +83,11 @@ int update(int * nums) {
     if (strcmp(cards[nums[0]-1].planet,cards[nums[1]-1].planet)==0)
     {
         score = score + 1;
+        if (score == 8)
+        {
+            flag=1;
+            return 2;
+        }
         cards[nums[0]-1].flipped = 1;
         cards[nums[1]-1].flipped = 1;
         return 1;
@@ -86,30 +95,56 @@ int update(int * nums) {
     else return 0;
 }
 
-void display(int isMatch) {
-    if (isMatch == 1) printf("This was a match\n");
-    else printf("This wasn't a match\n");
-    
-    printf("Score: %d\n", score);
-
-    printf("Remaining card numbers: ");
-    for (int i = 0; i <16; i++)
+int display(int isMatch) { 
+    if (isMatch==0) 
     {
-        if (cards[i].flipped!=1) printf("%d, ",i+1);
+        printf("This wasn't a match\n");
+        printf("Score: %d\n", score);
+        printf("Remaining card numbers: ");
+        for (int i = 0; i <16; i++)
+        {
+            if (cards[i].flipped!=1) printf("%d, ",i+1);
+        }
+        return 0;
+    }
+    else if (isMatch == 1)
+    {
+        printf("Matched planet:\n");
+        printf("Score: %d\n", score);
+        printf("Remaining card numbers: ");
+        for (int i = 0; i <16; i++)
+        {
+            if (cards[i].flipped!=1) printf("%d, ",i+1);
+        }
+        return 0;
+    }
+    else if (isMatch==2)
+    {
+        char another[3];
+        printf("\nCongrats! You won!\n");
+        printf("Would you like to play again? yes or no\n");
+        scanf("%s", another);
+        if (strcmp(another,"yes")==0)
+        {
+            initialize();
+            return 0;
+        }
+        else return 1;
     }
 }
 
 int main() {
     initialize();
     int flag = 0;
-    do {
-        if (score == 8) flag = 1;
-        int * nums;
-        if (flag!=1) nums = input();
+    int * nums;
+    while (flag != 1) 
+    {
+        printf("\nBeginning while loop with flag = %d\n",flag);
+        nums = input();
         if (nums[0] == 0 || nums[1] == 0)
             flag = 1;
-        if (flag!=1) display(update(nums));
-    } while(flag == 0);
+        if (flag != 1) flag = display(update(nums));
+    } 
 
     teardown();
 }
