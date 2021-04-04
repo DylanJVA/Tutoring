@@ -51,10 +51,6 @@ void initialize() {
         strcpy(cards[rng].planet,planets[i]);
         cards[rng].flipped=0;
     }
-    /*for (int i=0;i<16;i++)
-    {
-        printf("%d. %s\n",i+1,cards[i].planet);
-    }*/
     
 }
 
