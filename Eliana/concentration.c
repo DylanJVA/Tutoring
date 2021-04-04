@@ -4,6 +4,7 @@
 #include <time.h>
 int score;
 int flag;
+int * nums;
 //card structure "object" in java
 struct cardStruct {
         char planet[10];
@@ -50,10 +51,10 @@ void initialize() {
         strcpy(cards[rng].planet,planets[i]);
         cards[rng].flipped=0;
     }
-    for (int i=0;i<16;i++)
+    /*for (int i=0;i<16;i++)
     {
         printf("%d. %s\n",i+1,cards[i].planet);
-    }
+    }*/
     
 }
 
@@ -70,6 +71,7 @@ int * input() {
     } while (guesses[0] > 16 || guesses[0] < 0 || cards[guesses[0]-1].flipped == 1);
 
     if (guesses[0] == 0) return guesses;
+    printf("Card 1: %s\n",cards[guesses[0]-1].planet);
 
     do {
         printf("Enter num 2 (1-16, 0 to exit, NOT %d)\n", guesses[0]);
@@ -79,7 +81,7 @@ int * input() {
     return guesses;
 }
 
-int update(int * nums) { 
+int update() { 
     if (strcmp(cards[nums[0]-1].planet,cards[nums[1]-1].planet)==0)
     {
         score = score + 1;
@@ -98,6 +100,7 @@ int update(int * nums) {
 int display(int isMatch) { 
     if (isMatch==0) 
     {
+        printf("Card 2: %s\n",cards[nums[1]-1].planet);
         printf("This wasn't a match\n");
         printf("Score: %d\n", score);
         printf("Remaining card numbers: ");
@@ -109,7 +112,8 @@ int display(int isMatch) {
     }
     else if (isMatch == 1)
     {
-        printf("Matched planet:\n");
+        printf("Card 2: %s\n",cards[nums[1]-1].planet);
+        printf("This was a match\n");
         printf("Score: %d\n", score);
         printf("Remaining card numbers: ");
         for (int i = 0; i <16; i++)
@@ -136,14 +140,13 @@ int display(int isMatch) {
 int main() {
     initialize();
     int flag = 0;
-    int * nums;
-    while (flag != 1) 
+    while (flag != 1)
     {
-        printf("\nBeginning while loop with flag = %d\n",flag);
         nums = input();
         if (nums[0] == 0 || nums[1] == 0)
             flag = 1;
-        if (flag != 1) flag = display(update(nums));
+        else flag = display(update());
+        printf("\n------------------\n");
     } 
 
     teardown();
