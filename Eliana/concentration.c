@@ -5,7 +5,6 @@
 int score;
 int flag;
 int * nums;
-//card structure "object" in java
 struct cardStruct {
         char planet[10];
         int flipped;
@@ -51,7 +50,6 @@ void initialize() {
         strcpy(cards[rng].planet,planets[i]);
         cards[rng].flipped=0;
     }
-    
 }
 
 void teardown() {
@@ -93,17 +91,21 @@ int update() {
     else return 0;
 }
 
+void printRemaining() {
+    printf("Remaining card numbers: ");
+    for (int i = 0; i <16; i++)
+    {
+        if (cards[i].flipped!=1) printf("%d, ",i+1);
+    }
+}
+
 int display(int isMatch) { 
     if (isMatch==0) 
     {
         printf("Card 2: %s\n",cards[nums[1]-1].planet);
         printf("This wasn't a match\n");
         printf("Score: %d\n", score);
-        printf("Remaining card numbers: ");
-        for (int i = 0; i <16; i++)
-        {
-            if (cards[i].flipped!=1) printf("%d, ",i+1);
-        }
+        printRemaining();
         return 0;
     }
     else if (isMatch == 1)
@@ -111,11 +113,7 @@ int display(int isMatch) {
         printf("Card 2: %s\n",cards[nums[1]-1].planet);
         printf("This was a match\n");
         printf("Score: %d\n", score);
-        printf("Remaining card numbers: ");
-        for (int i = 0; i <16; i++)
-        {
-            if (cards[i].flipped!=1) printf("%d, ",i+1);
-        }
+        printRemaining();
         return 0;
     }
     else if (isMatch==2)
@@ -144,6 +142,5 @@ int main() {
         else flag = display(update());
         printf("\n------------------\n");
     } 
-
     teardown();
 }
